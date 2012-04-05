@@ -1,0 +1,31 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=4006
+
+HyperList is a methodology to describe anything in plain text.
+
+HyperList can be used to describe any state or transition - anything from simple shopping and todo lists to large project plans, process design, the human history, the human DNA or the whole universe.
+
+With HyperList, descriptions become simple, easily readable, concise and precise. 
+
+This VIM plugin makes it easy to create and manage HyperLists using VIM.
+
+The plugin includes a large range of features such as:
+
+* Complete highlighting of HyperList elements
+* Collapsing and expanding of up to 15 levels in a list
+* Linking/referencing between elements (items) in a list
+* Easy navigation in lists, including jumping to references
+* "Presentation modes" where you can view only parts of lists and line-by-line
+* Automatic underlining of State or Transition items in a list
+* Creating and checking of checkboxes in a list, with or without date stamps
+* Easy navigation to elements that needs filling out (when you use a list as a template)
+* Encryption (and decryption) of whole lists or parts of lists
+* Auto-encryption of lists - making a list into an excellent password safe
+* HTML export of lists
+* LaTeX export of lists
+* Description on how to include HyperLists within other filetypes, thus taking full advantage of the above features when including a HyperList in e.g. a normal .txt document.
+* All documents with the file suffix ".hl" is treated as HyperList documents
+* ... and there are many more features. Check out the comprehensive documentation (type ":help HyperList" in VIM after install)
+
+This VIM plugin is the continuation of the now deprecated WOIM plugin (http://www.vim.org/scripts/script.php?script_id=2518)
+
+There is virtually no limit to what you can use HyperLists for. Contact me at g @ isene . com if you have any questions or suggestions, or if you just want to have a chat about HyperList (or any other things that are cool & interesting). See http://isene.com for more of my work.
