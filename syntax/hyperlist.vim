@@ -12,15 +12,12 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2 - compatible with the HyperList definition v. 2
-" Modified:	2012-03-28
-" Changes:      Name change (from WOIM to HyperList)
-"               Complete overhaul of the definition document (http://isene.com/hyperlist.pdf)
-"               Complete overhaul of the plugin documentation (this file)
-"               Underlining of States and Transitions now toggles with <leader>u
-"               Included "|" as alternative for "S: " and "/" for "T: "
-"               Upgraded LaTeX export
-"               Lots of minor fixes
+" Version:	2.1 - compatible with the HyperList definition v. 2
+" Modified:	2012-04-16
+" Changes:      Better syntax highlighting for folds (both term & gui and
+"               both for dark and light backgrounds). 
+"               Added "sync minlines/maxlines" settings to be changed for
+"               slow computers.
 
 " INSTRUCTIONS {{{1
 "
@@ -79,6 +76,10 @@ set foldmethod=syntax
 set fillchars=fold:\ 
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
+" Lower the next two values if you have a slow computer
+syn sync minlines=50
+syn sync maxlines=200
+
 
 " Functions {{{1
 "  Folding {{{2
@@ -443,7 +444,7 @@ syn match   HLcomment "(.\{-})" contains=HLtodo,HLref
 syn match   HLquote   '".\{-}"' contains=HLtodo,HLref
 
 " TODO  or FIXME
-syn keyword HLtodo    TODO FIXME						
+syn keyword HLtodo    TODO FIXME 
 
 " Item motion
 syn match   HLmove    ">>\|<<\|->\|<-"
@@ -477,8 +478,7 @@ syn region L1 start="^\S"                    end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"
 syn match   HLvim "^vim:.*"
 
 " Highlighting and Linking {{{1
-hi	    Folded	ctermfg=yellow ctermbg=none guibg=NONE guifg=darkyellow gui=bold
-hi	    L1		gui=bold term=bold cterm=bold
+hi	    Folded	ctermfg=NONE guifg=NONE gui=bold term=bold cterm=bold guibg=NONE ctermbg=NONE
 hi def link HLident	Define
 hi def link HLmulti	Define
 hi def link HLtag	String
