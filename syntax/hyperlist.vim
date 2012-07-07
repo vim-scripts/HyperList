@@ -12,12 +12,10 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1 - compatible with the HyperList definition v. 2
-" Modified:	2012-04-16
-" Changes:      Better syntax highlighting for folds (both term & gui and
-"               both for dark and light backgrounds). 
-"               Added "sync minlines/maxlines" settings to be changed for
-"               slow computers.
+" Version:	2.1.2 - compatible with the HyperList definition v. 2.1
+" Modified:	2012-07-07
+" Changes:      Important security upgrade: Removed traces of encrypted
+"               data upon en/decrypting (part of) a HyperList.
 
 " INSTRUCTIONS {{{1
 "
@@ -94,6 +92,13 @@ function! HLFoldText()
     let line = ' ' . line
   endwhile
   return line
+endfunction
+
+"  Encryption {{{2
+"  Remove traces of secure info upon decrypting (part of) a HyperList
+function! HLdecrypt()
+  set viminfo=""
+  set noswapfile
 endfunction
 
 "  Underlining States/Transitions {{{2
@@ -537,15 +542,15 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nmap <leader>z        V:!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-vmap <leader>z        :!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>Z        :%!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>x        V:!openssl bf -d -a 2>/dev/null<CR><C-L>
-vmap <leader>x        :!openssl bf -d -a 2>/dev/null<CR><C-L>
-nmap <leader>X        :%!openssl bf -d -a 2>/dev/null<CR><C-L>
+nmap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
+vmap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
+nmap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
+nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -d -a 2>/dev/null<CR><C-L>
+vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -d -a 2>/dev/null<CR><C-L>
+nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -d -a 2>/dev/null<CR><C-L>
 
 nmap <leader>L        :call LaTeXconversion()<CR>
 nmap <leader>H        :call HTMLconversion()<CR>
 
 " vim modeline {{{1
-" vim: sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
+" vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :

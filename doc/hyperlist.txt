@@ -998,10 +998,17 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 7 Changelog                                              *HyperList-Changelog*
 
 
-VERSION 2				2012-04-28
+VERSION 2.1.2		2012-007-07
 
 	Changes:
-	Upgraded to reflect the new Hyperlist version (2.1)
+	Important security upgrade: Removed traces of encrypted data upon
+	en/decrypting (part of) a HyperList.
+
+
+VERSION 2.1.1		2012-04-28
+
+	Changes:
+	Upgraded plugin to reflect the new Hyperlist version (2.1)
 
 
 VERSION 2				2012-03-28
