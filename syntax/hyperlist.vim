@@ -2,7 +2,7 @@
 " Language:	Self defined markup and functions for HyperLists in Vim
 " Author:	Geir Isene <g@isene.com>
 " Web_site:	http://isene.com/
-" WOIM_def:	http://isene.com/hyperlist.pdf
+" WOIM_def:	http://www.scribd.com/doc/56083458/HyperList
 " License:	I release all copyright claims. 
 "		This code is in the public domain.
 "		Permission is granted to use, copy modify, distribute, and
@@ -12,10 +12,12 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1.2 - compatible with the HyperList definition v. 2.1
-" Modified:	2012-07-07
-" Changes:      Important security upgrade: Removed traces of encrypted
-"               data upon en/decrypting (part of) a HyperList.
+" Version:	2.1.3 - compatible with the HyperList definition v. 2.1
+" Modified:	2012-08-31
+" Changes:      Included more accented characters
+"               Speedup; Adjusted minimum and maximum lines of sync'ing
+"               Fixed identifiers
+
 
 " INSTRUCTIONS {{{1
 "
@@ -75,8 +77,8 @@ set fillchars=fold:\
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
 " Lower the next two values if you have a slow computer
-syn sync minlines=50
-syn sync maxlines=200
+syn sync minlines=20
+syn sync maxlines=100
 
 
 " Functions {{{1
@@ -409,7 +411,7 @@ endfunction
 " Syntax definitions {{{1
 "  HyperList elements {{{2
 "  Identifier (any number in front)
-syn match   HLident   "^\(\t\|\*\)\+[0-9]\S*"
+syn match   HLident   "^\(\t\|\*\)\+[0-9.]*"
 
 " Multi-line
 syn match   HLmulti   "^\(\t\|\*\)\++ "
@@ -422,16 +424,16 @@ syn match   HLtrans	"\(\(\s\|\*\)\(T: \|/ \)\)\@<=[^;]*" contains=HLtodo,HLop,HL
 syn match   HLqual    "\[.\{-}\]" contains=HLtodo,HLref,HLcomment
 
 " Tags - anything that ends in a colon
-syn match   HLtag	'\(\s\|\*\)\@<=[a-zA-ZæøåÆØÅ0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+syn match   HLtag	'\(\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(\s\|\*\)\@<=[A-ZÆØÅ_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(\s\|\*\)\@<=[A-ZÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	";"
 
 " References start with a hash (#)
-syn match   HLref	"#\{1,2}\(\'[a-zA-ZæøåÆØÅ0-9,.:/ _&?%=+\-\*]\+\'\|[a-zA-ZæøåÆØÅ0-9.:/_&?%=+\-\*]\+\)" contains=HLcomment
+syn match   HLref	"#\{1,2}\(\'[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&?%=+\-\*]\+\'\|[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+\)" contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP

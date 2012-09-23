@@ -18,7 +18,10 @@ This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
 definition document:
 
-  http://isene.com/hyperlist.pdf
+	http://www.scribd.com/doc/56083458/HyperList
+
+Find more at:
+	http://isene.com
 
 HyperList was formerly known as WOIM. The ftdetect file contains the file
 suffix ".woim" for backward compatability so that these file typeas are also
@@ -998,7 +1001,15 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 7 Changelog                                              *HyperList-Changelog*
 
 
-VERSION 2.1.2		2012-007-07
+VERSION 2.1.3		2012-09-23
+
+  Changes:
+	Included more accented characters
+  Speedup; Adjusted minimum and maximum lines of sync'ing
+  Fixed identifiers
+
+
+VERSION 2.1.2		2012-07-07
 
 	Changes:
 	Important security upgrade: Removed traces of encrypted data upon
@@ -1015,7 +1026,7 @@ VERSION 2				2012-03-28
 
 	Changes:
 	Name change (from WOIM to HyperList)
-	Complete overhaul of the definition document (http://isene.com/hyperlist.pdf)
+	Complete overhaul of the definition document
 	Complete overhaul of the plugin documentation (this file)
 	Underlining of States and Transitions now toggles with <leader>u
 	Included "|" as alternative for "S: " and "/" for "T: "
