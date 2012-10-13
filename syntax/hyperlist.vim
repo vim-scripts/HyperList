@@ -12,12 +12,11 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1.3 - compatible with the HyperList definition v. 2.1
-" Modified:	2012-08-31
-" Changes:      Included more accented characters
-"               Speedup; Adjusted minimum and maximum lines of sync'ing
-"               Fixed identifiers
-
+" Version:	2.1.4 - compatible with the HyperList definition v. 2.1
+" Modified:	2012-09-25
+" Changes:      Added "zx" as a command to update folding (to update syntax)
+"               Added <CR> as an alternative to gr (Goto Ref)
+"               Added a mark (m') to gr/<CR> to facilitate easy jump back 
 
 " INSTRUCTIONS {{{1
 "
@@ -78,7 +77,7 @@ syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
 " Lower the next two values if you have a slow computer
 syn sync minlines=20
-syn sync maxlines=100
+syn sync maxlines=40
 
 
 " Functions {{{1
@@ -411,23 +410,23 @@ endfunction
 " Syntax definitions {{{1
 "  HyperList elements {{{2
 "  Identifier (any number in front)
-syn match   HLident   "^\(\t\|\*\)\+[0-9.]*"
+syn match   HLident   "^\(\t\|\*\)*[0-9.]* "
 
 " Multi-line
-syn match   HLmulti   "^\(\t\|\*\)\++ "
+syn match   HLmulti   "^\(\t\|\*\)*+ "
 
 " State & Transitions
-syn match   HLstate	"\(\(\s\|\*\)\(S: \|| \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
-syn match   HLtrans	"\(\(\s\|\*\)\(T: \|/ \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
+syn match   HLstate	"\(^\|\(\s\|\*\)\(S: \|| \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
+syn match   HLtrans	"\(^\|\(\s\|\*\)\(T: \|/ \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
 
 " Qualifiers are enclosed within [ ]
 syn match   HLqual    "\[.\{-}\]" contains=HLtodo,HLref,HLcomment
 
 " Tags - anything that ends in a colon
-syn match   HLtag	'\(\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(\s\|\*\)\@<=[A-ZÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	";"
@@ -465,6 +464,7 @@ syn match   HLu	" \@<=_.\{-}_ "
 syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans
 
 "  HyperList indentation (folding levels) {{{2
+if !exists("g:disable_collapse")
 syn region L15 start="^\(\t\|\*\)\{14} \=\S" end="^\(^\(\t\|\*\)\{15,} \=\S\)\@!" fold contains=@HLtxt
 syn region L14 start="^\(\t\|\*\)\{13} \=\S" end="^\(^\(\t\|\*\)\{14,} \=\S\)\@!" fold contains=@HLtxt,L15
 syn region L13 start="^\(\t\|\*\)\{12} \=\S" end="^\(^\(\t\|\*\)\{13,} \=\S\)\@!" fold contains=@HLtxt,L14,L15
@@ -480,6 +480,7 @@ syn region L4 start="^\(\t\|\*\)\{3} \=\S"   end="^\(^\(\t\|\*\)\{4,} \=\S\)\@!"
 syn region L3 start="^\(\t\|\*\)\{2} \=\S"   end="^\(^\(\t\|\*\)\{3,} \=\S\)\@!"  fold contains=@HLtxt,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
 syn region L2 start="^\(\t\|\*\)\{1} \=\S"   end="^\(^\(\t\|\*\)\{2,} \=\S\)\@!"  fold contains=@HLtxt,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
 syn region L1 start="^\S"                    end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"  fold contains=@HLtxt,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+endif
 
 "  VIM parameters (VIM modeline) {{{2
 syn match   HLvim "^vim:.*"
@@ -528,6 +529,7 @@ map <leader>d         :set foldlevel=13<CR>
 map <leader>e         :set foldlevel=14<CR>
 map <leader>f         :set foldlevel=15<CR>
 map <SPACE>           za
+nmap zx               i<esc>
 
 map <leader>u         :call STunderline()<CR>
 
@@ -536,7 +538,8 @@ map <leader>V         :call CheckItem("stamped")<CR>
 
 map <leader><SPACE>   /=\s*$<CR>A
 
-map gr		      :call GotoRef()<CR>
+nmap gr		      m':call GotoRef()<CR>
+nmap <CR>	      m':call GotoRef()<CR>
 
 nmap g<DOWN>          <DOWN><leader>0zv
 nmap g<UP>            <leader>f<UP><leader>0zv

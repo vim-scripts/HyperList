@@ -55,9 +55,16 @@ As a sort of "presentation mode", you can traverse a WOIM list by using
 g<DOWN> or g<UP> to view only the current line and its ancestors.
 An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
 
-Use "gr" when the cursor is on a reference to jump to the referenced item.
-A reference can be in the list or to a file by the use of
-#file:/pathto/filename, #file:~/filename or #file:filename.
+Use "gr" (without the quotation marks, signifies "Goto Ref") or simply
+press the "Enter" ("<CR>") key while the cursor is on a HyperList
+reference to jump to that destination in a HyperList. Use "n" after a "gr"
+to verify that the reference destination is unique. A reference can be in
+the list or to a file by the use of #file:/pathto/filename,
+#file:~/filename or #file:filename.
+
+Whenever you jump to a reference in this way, the mark "'" is set at the
+point you jumped from so that you may easily jump back by hitting "''"
+(single quoutes twice). 
 
 Use <leader>u to toggle underlining of Transitions, States or no underlining.
 
@@ -79,7 +86,13 @@ Use <leader>X decrypts the current file (all lines).
 A dot file (file name starts with a "." such as .test.woim) is
 automatically encrypted on save and decrypted on opening.
 
-Syntax is updated at start and every time you leave Insert mode.
+Syntax updated at start and every time you leave Insert mode, or you can
+press "zx" to update the syntax. 
+
+You may speed up larger HyperListS by setting the the global variable
+"disable_collapse" - add the following to your .vimrc:
+
+  let "g:disable_collapse" = 1
 
 For this help and more, including the full WOIM definition/description, type 
 
