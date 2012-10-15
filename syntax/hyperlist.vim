@@ -12,11 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1.4 - compatible with the HyperList definition v. 2.1
-" Modified:	2012-09-25
-" Changes:      Added "zx" as a command to update folding (to update syntax)
-"               Added <CR> as an alternative to gr (Goto Ref)
-"               Added a mark (m') to gr/<CR> to facilitate easy jump back 
+" Version:	2.1.6 - compatible with the HyperList definition v. 2.1
+" Modified:	2012-10-15
+" Changes:      Fixed GotoRef function
 
 " INSTRUCTIONS {{{1
 "
@@ -142,10 +140,11 @@ function! CheckItem (stamp)
 endfunction
 
 "  Goto reference {{{2
-"  Mapped to 'gr'
+"  Mapped to 'gr' and <CR>
 if !exists("*GotoRef") 
   function! GotoRef()
     let current_line = getline('.')
+    let ref_multi = 0
     if match(current_line,'#') >= 0
       if match(current_line,'file:') >=0
         if match(current_line,"#.* ") >= 0
@@ -161,7 +160,12 @@ if !exists("*GotoRef")
         let ref_word = matchstr(current_line,"#\'.*\'")
         let ref_word = substitute(ref_word, "\'", '', 'g')
         let ref_word = substitute(ref_word, '#', '', 'g')
-        let ref_dest = substitute(ref_word, '/', '.*\\n\\s*.\\{-}', 'g')
+        let ref_end  = ref_word
+        if match(ref_word,"\/") >= 0
+          let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
+          let ref_multi = 1
+        endif
+        let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
         let ref_dest = "\\\(#\\\'\\\)\\\@<!" . ref_dest
       else
         if match(current_line,"#.* ") >= 0
@@ -170,7 +174,12 @@ if !exists("*GotoRef")
           let ref_word = matchstr(current_line,"#.*$")
         endif
         let ref_word = substitute(ref_word, '#', '', 'g')
-        let ref_dest = substitute(ref_word, '/', '.*\\n\\s*.\\{-}', 'g')
+        let ref_end  = ref_word
+        if match(ref_word,"\/") >= 0
+          let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
+          let ref_multi = 1
+        endif
+        let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
         let ref_dest = "#\\\@<!" . ref_dest
       endif
       let @/ = ref_dest
@@ -178,6 +187,10 @@ if !exists("*GotoRef")
       let new_line = getline('.')
       if new_line == current_line
         echo "No destination"
+      else
+        if ref_multi == 1
+          call search(ref_end)
+        end
       endif
     else
       echo "No reference in the HyperList item"
