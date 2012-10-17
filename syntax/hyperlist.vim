@@ -12,9 +12,10 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1.6 - compatible with the HyperList definition v. 2.1
-" Modified:	2012-10-15
-" Changes:      Fixed GotoRef function
+" Version:	2.1.7 - compatible with the HyperList definition v. 2.1
+" Modified:	2012-10-17
+" Changes:      Fixed bugs in Identifier and Multi
+"               Cosmetic fixes
 
 " INSTRUCTIONS {{{1
 "
@@ -422,18 +423,19 @@ endfunction
 
 " Syntax definitions {{{1
 "  HyperList elements {{{2
-"  Identifier (any number in front)
-syn match   HLident   "^\(\t\|\*\)*[0-9.]* "
+
+" Identifier (any number in front)
+syn match   HLident     '^\(\t\|\*\)*[0-9.]* '
 
 " Multi-line
-syn match   HLmulti   "^\(\t\|\*\)*+ "
+syn match   HLmulti     '^\(\t\|\*\)*+ '
 
 " State & Transitions
-syn match   HLstate	"\(^\|\(\s\|\*\)\(S: \|| \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
-syn match   HLtrans	"\(^\|\(\s\|\*\)\(T: \|/ \)\)\@<=[^;]*" contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
+syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
+syn match   HLtrans	'\(\(^\|\s\|\*\)\(T: \|/ \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
 
 " Qualifiers are enclosed within [ ]
-syn match   HLqual    "\[.\{-}\]" contains=HLtodo,HLref,HLcomment
+syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 
 " Tags - anything that ends in a colon
 syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
@@ -442,36 +444,36 @@ syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁ�
 syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
-syn match   HLsc	";"
+syn match   HLsc	';'
 
 " References start with a hash (#)
-syn match   HLref	"#\{1,2}\(\'[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&?%=+\-\*]\+\'\|[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+\)" contains=HLcomment
+syn match   HLref	'#\{1,2}\(\'[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&?%=+\-\*]\+\'\|[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+\)' contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP
 
 " Marking literal start and end (a whole literal region is folded as one block)
-syn match   HLlit     "\(\s\|\*\)\@<=\\$"
+syn match   HLlit       '\(\s\|\*\)\@<=\\$'
 
 " Content of litaral (with no syntax highlighting)
-syn match   HLlc      "\(\s\|\*\)\\\_.\{-}\(\s\|\*\)\\" contains=HLlit
+syn match   HLlc        '\(\s\|\*\)\\\_.\{-}\(\s\|\*\)\\' contains=HLlit
 
 " Comments are enclosed within ( )
-syn match   HLcomment "(.\{-})" contains=HLtodo,HLref
+syn match   HLcomment   '(.\{-})' contains=HLtodo,HLref
 
 " Text in quotation marks
-syn match   HLquote   '".\{-}"' contains=HLtodo,HLref
+syn match   HLquote     '".\{-}"' contains=HLtodo,HLref
 
 " TODO  or FIXME
 syn keyword HLtodo    TODO FIXME 
 
 " Item motion
-syn match   HLmove    ">>\|<<\|->\|<-"
+syn match   HLmove      '>>\|<<\|->\|<-'
 
 " Bold and Italic
-syn match   HLb	" \@<=\*.\{-}\* "
-syn match   HLi	" \@<=/.\{-}/ "
-syn match   HLu	" \@<=_.\{-}_ "
+syn match   HLb	        ' \@<=\*.\{-}\* '
+syn match   HLi	        ' \@<=/.\{-}/'
+syn match   HLu	        ' \@<=_.\{-}_'
 
 " Cluster the above
 syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans
@@ -501,7 +503,7 @@ syn match   HLvim "^vim:.*"
 " Highlighting and Linking {{{1
 hi	    Folded	ctermfg=NONE guifg=NONE gui=bold term=bold cterm=bold guibg=NONE ctermbg=NONE
 hi def link HLident	Define
-hi def link HLmulti	Define
+hi def link HLmulti	Statement
 hi def link HLtag	String
 hi def link HLop	Function
 hi def link HLqual	Type
