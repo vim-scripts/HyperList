@@ -1,6 +1,6 @@
 This is a mirror of http://www.vim.org/scripts/script.php?script_id=4006
 
-HyperList is a methodology to describe anything in plain text.
+HyperList is a methodology to describe anything in plain text (Link: http://isene.me/hyperlist/)
 
 It can be used as an outliner, a project or process tool, a logic breakdown tool, a mind map or for any number of different usages. Your imagination is (almost) the only limit.
 
@@ -25,7 +25,7 @@ The plugin includes a large range of features such as:
 * HTML export of lists
 * LaTeX export of lists
 * Description on how to include HyperLists within other filetypes, thus taking full advantage of the above features when including a HyperList in e.g. a normal .txt document.
-* All documents with the file suffix ".hl" is treated as HyperList documents
+* All documents with the file suffix ".hl" are treated as HyperList documents
 * ... and there are many more features. Check out the comprehensive documentation (type ":help HyperList" in VIM after install)
 
 This VIM plugin is the continuation of the now deprecated WOIM plugin (http://www.vim.org/scripts/script.php?script_id=2518)

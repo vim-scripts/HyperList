@@ -2,7 +2,7 @@
 " Language:	Self defined markup and functions for HyperLists in Vim
 " Author:	Geir Isene <g@isene.com>
 " Web_site:	http://isene.com/
-" WOIM_def:	http://www.scribd.com/doc/56083458/HyperList
+" HyperList:	http://isene.com/hyperlist/
 " License:	I release all copyright claims. 
 "		This code is in the public domain.
 "		Permission is granted to use, copy modify, distribute, and
@@ -12,10 +12,15 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.1.7 - compatible with the HyperList definition v. 2.1
-" Modified:	2012-10-17
-" Changes:      Fixed bugs in Identifier and Multi
-"               Cosmetic fixes
+" Version:	2.3 - compatible with the HyperList definition v. 2.3
+" Modified:	2015-02-14
+" Changes:      Updated plugin to HyperList definition version 2.3
+"               Made the changes necessary to accommodate for Twitter-type (hash)Tags
+"               New markup for References (and included "@" in references)
+"               Fixed bold/italic/underlined
+"               Changed the Change Markup
+"               Updated Latex/HTML conversion
+"               Updated documentation
 
 " INSTRUCTIONS {{{1
 "
@@ -24,7 +29,7 @@
 " Use <SPACE> to toggle one fold.
 " Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 "
-" As a sort of "presentation mode", you can traverse a WOIM list by using
+" As a sort of "presentation mode", you can traverse a HyperList by using
 " g<DOWN> or g<UP> to view only the current line and its ancestors.
 " An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
 " 
@@ -49,7 +54,7 @@
 " Use <leader>X decrypts the current file (all lines).
 " <leader>z and <leader>x can be used with visual ranges.
 "
-" A dot file (file name starts with a "." such as .test.woim) is
+" A dot file (file name starts with a "." such as .test.hl) is
 " automatically encrypted on save and decrypted on opening.
 "
 " Syntax is updated at start and every time you leave Insert mode.
@@ -75,8 +80,8 @@ set fillchars=fold:\
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
 " Lower the next two values if you have a slow computer
-syn sync minlines=20
-syn sync maxlines=40
+syn sync minlines=50
+syn sync maxlines=100
 
 
 " Functions {{{1
@@ -146,43 +151,17 @@ if !exists("*GotoRef")
   function! GotoRef()
     let current_line = getline('.')
     let ref_multi = 0
-    if match(current_line,'#') >= 0
-      if match(current_line,'file:') >=0
-        if match(current_line,"#.* ") >= 0
-          let ref_word = matchstr(current_line,"#.* ")
-        else
-          let ref_word = matchstr(current_line,"#.*$")
-        endif
-        let ref_word = substitute(ref_word, '#file:', '', 'g')
-        exe "edit " . fnameescape(ref_word)
-        return
+    if match(current_line,'<.*>') >= 0
+      let ref_word = matchstr(current_line,"<.\\{-}>")
+      let ref_word = substitute(ref_word, "<", '', 'g')
+      let ref_word = substitute(ref_word, '>', '', 'g')
+      let ref_end  = ref_word
+      if match(ref_word,"\/") >= 0
+        let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
+        let ref_multi = 1
       endif
-      if match(current_line,"#\'") >= 0
-        let ref_word = matchstr(current_line,"#\'.*\'")
-        let ref_word = substitute(ref_word, "\'", '', 'g')
-        let ref_word = substitute(ref_word, '#', '', 'g')
-        let ref_end  = ref_word
-        if match(ref_word,"\/") >= 0
-          let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
-          let ref_multi = 1
-        endif
-        let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
-        let ref_dest = "\\\(#\\\'\\\)\\\@<!" . ref_dest
-      else
-        if match(current_line,"#.* ") >= 0
-          let ref_word = matchstr(current_line,"#.* ")
-        else
-          let ref_word = matchstr(current_line,"#.*$")
-        endif
-        let ref_word = substitute(ref_word, '#', '', 'g')
-        let ref_end  = ref_word
-        if match(ref_word,"\/") >= 0
-          let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
-          let ref_multi = 1
-        endif
-        let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
-        let ref_dest = "#\\\@<!" . ref_dest
-      endif
+      let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
+      let ref_dest = "\\s" . ref_dest
       let @/ = ref_dest
       call search(ref_dest)
       let new_line = getline('.')
@@ -248,8 +227,13 @@ function! HTMLconversion ()
     catch
     endtry
     try
+        "HLhash
+        execute "%s/\\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)/<font color=\"yellow\">\\1<\\/font>/g"
+    catch
+    endtry
+    try
         "HLref
-        execute "%s/\\(#\\{1,2}\\(\\'[a-zA-ZæøåÆØÅ0-9,.:/ _&?%=\\-\\*]\\+\\'\\|[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)\\)/<font color=\"purple\">\\1<\\/font>/g"
+        execute "%s/\\(<\\{1,2}\\[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+>\\{1,2}\\)/<font color=\"purple\">\\1<\\/font>/g"
     catch
     endtry
     try
@@ -268,7 +252,7 @@ function! HTMLconversion ()
     catch
     endtry
     try
-        "HLtag
+        "HLprop
         execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/<font color=\"red\">\\2<\\/font>/g"
     catch
     endtry
@@ -355,8 +339,13 @@ function! LaTeXconversion ()
     catch
     endtry
     try
+        "HLhash
+        execute "%s/\\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)/\\\\textcolor{o}{\\1}/g"
+    catch
+    endtry
+    try
         "HLref
-        execute "%s/\\(#\\{1,2}\\(\\'[a-zA-ZæøåÆØÅ0-9,.:/ _&?%=\\-\\*]\\+\\'\\|[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)\\)/\\\\textcolor{v}{\\1}/g"
+        execute "%s/\\(<\\{1,2}[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+>\\{1,2}\\)/\\\\textcolor{v}{\\1}/g"
     catch
     endtry
     try
@@ -385,7 +374,7 @@ function! LaTeXconversion ()
     catch
     endtry
     try
-        "HLtag
+        "HLprop
         execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\\\textcolor{r}{\\emph{\\2}}/g"
     catch
     endtry
@@ -412,6 +401,7 @@ function! LaTeXconversion ()
     normal o\definecolor{b}{rgb}{0,0,0.5}
     normal o\definecolor{v}{rgb}{0.4,0,0.4}
     normal o\definecolor{t}{rgb}{0,0.4,0.4}
+    normal o\definecolor{0}{rgb}{0.6,0.6,0}
     normal o
     normal o\begin{document}
     normal o\begin{alltt}
@@ -438,16 +428,19 @@ syn match   HLtrans	'\(\(^\|\s\|\*\)\(T: \|/ \)\)\@<=.*' contains=HLtodo,HLop,HL
 syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 
 " Tags - anything that ends in a colon
-syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?%= \-\/+<>#'\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
 
-" References start with a hash (#)
-syn match   HLref	'#\{1,2}\(\'[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&?%=+\-\*]\+\'\|[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+\)' contains=HLcomment
+" Hashtags (like Twitter)
+syn match   HLhash	'#[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+'
+
+" References
+syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&@?%=+\-\*]\+>\{1,2}' contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP
@@ -468,15 +461,15 @@ syn match   HLquote     '".\{-}"' contains=HLtodo,HLref
 syn keyword HLtodo    TODO FIXME 
 
 " Item motion
-syn match   HLmove      '>>\|<<\|->\|<-'
+"syn match   HLmove      '>>\|<<\|->\|<-'
 
 " Bold and Italic
-syn match   HLb	        ' \@<=\*.\{-}\* '
-syn match   HLi	        ' \@<=/.\{-}/'
-syn match   HLu	        ' \@<=_.\{-}_'
+syn match   HLb	        ' \@<=\*.\{-}\* \@='
+syn match   HLi	        ' \@<=/.\{-}/ \@='
+syn match   HLu	        ' \@<=_.\{-}_ \@='
 
 " Cluster the above
-syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans
+syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans
 
 "  HyperList indentation (folding levels) {{{2
 if !exists("g:disable_collapse")
@@ -501,12 +494,13 @@ endif
 syn match   HLvim "^vim:.*"
 
 " Highlighting and Linking {{{1
-hi	    Folded	ctermfg=NONE guifg=NONE gui=bold term=bold cterm=bold guibg=NONE ctermbg=NONE
+hi	    Folded	gui=bold term=bold cterm=bold
 hi def link HLident	Define
-hi def link HLmulti	Statement
+hi def link HLmulti	String
 hi def link HLtag	String
 hi def link HLop	Function
 hi def link HLqual	Type
+hi def link HLhash	Label
 hi def link HLref	Define
 hi def link HLkey	Define
 hi          HLlit       ctermfg=none ctermbg=none gui=italic term=italic cterm=italic

@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.1)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3, 2015-02-14)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -18,10 +18,10 @@ This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
 definition document:
 
-	http://www.scribd.com/doc/56083458/HyperList
+	http://isene.com/hyperlist/
 
-Find more at:
-	http://isene.com
+Here you will also find HyperGraph - a Ruby script to graph both State
+HyperLists (like mindmaps) and Transitions Hyperlists (like flowcharts).
 
 HyperList was formerly known as WOIM. The ftdetect file contains the file
 suffix ".woim" for backward compatability so that these file typeas are also
@@ -40,13 +40,14 @@ CONTENTS                                                  *HyperList-Contents*
 		4.3.1 Elements............................|HyperList-Elements|
 		4.3.1.1 Operator..........................|HyperList-Operator|
 		4.3.1.2 Qualifier.........................|HyperList-Qualifier|
-		4.3.1.3 Tags..............................|HyperList-Tags|
+		4.3.1.2 Property..........................|HyperList-Property|
 		4.3.1.4 Description.......................|HyperList-Description|
 		4.3.2 Additives...........................|HyperList-Additives|
 		4.3.2.1 References........................|HyperList-References|
-		4.3.2.2 Comments..........................|HyperList-Comments|
-		4.3.2.3 Quotes............................|HyperList-Quotes|
-		4.3.2.4 Change Markup.....................|HyperList-ChangeMarkup|
+		4.3.2.2 Tags..............................|HyperList-Tags|
+		4.3.2.3 Comments..........................|HyperList-Comments|
+		4.3.2.4 Quotes............................|HyperList-Quotes|
+		4.3.2.5 Change Markup.....................|HyperList-ChangeMarkup|
 		4.4 Separator.............................|HyperList-Separator|
 		5 A self-defining system..................|HyperList-Self-definition|
     6 About...................................|HyperList-About|
@@ -83,7 +84,7 @@ When working wiht HyperLists in VIM:
 	the "Enter" ("<CR>") key while the cursor is on a HyperList reference to jump
 	to that destination in a HyperList. Use "n" after a "gr" to verify that the
 	reference destination is unique. A reference can be in the list or to a file
-	by the use of #file:/pathto/filename, #file:~/filename or #file:filename.
+	by the use of <file:/pathto/filename>, <file:~/filename> or <file:filename>.
 
 	Whenever you jump to a reference in this way, the mark "'" is set at the
 	point you jumped from so that you may easily jump back by hitting "''"
@@ -144,7 +145,7 @@ include WOIM lists in files with a ".txt", and the following example would
 become a HyperList with correct syntax highlighting and folding:
 
 HLstart
-This is a WOIM test list
+This is a HyperList test list
 	Here is a child to the above item
 		Here is "grand child"
 	Here we are one level back
@@ -191,8 +192,7 @@ be the best foundation for what I needed. The methodology was expanded to be
 capable of describing anything as easily as possible; I removed the graphical
 parts of Warnier/Orr and expanded the system substantially. It turned into WOIM
 (Warnier/Orr/Isene/Möller) and later got the more descriptive name of
-HyperList. My colleague Egil Möller's personal website: http://redhog.org/
-helped in the early refinements.
+HyperList. Egil Möller (http://redhog.org/) helped in the early refinements.
 
 Besides being the name of the system, "HyperList" is also used when referring
 to a list or lists conforming to this system.
@@ -281,19 +281,18 @@ as outlined here:
 		4.3.1 Element 
 			4.3.1.1 Operator
 			4.3.1.2 Qualifier
-			4.3.1.3 Tag 
+			4.3.1.3 Property
 			4.3.1.4 Description 
 		4.3.2 Additive
-			4.3.2.1 Reference 
-			4.3.2.2 Comment  
-			4.3.2.3 Quote
-			4.3.2.4 Change Markup
+			4.3.2.1 Reference
+			4.3.2.2 Tag 
+			4.3.2.3 Comment  
+			4.3.2.4 Quote
+			4.3.2.5 Change Markup
 	4.4 Separator
 
 Look familiar? Yes, it is part of the table of contents at the beginning of
-this documentation -- even that is a valid HyperList. If you are reading this
-document as a PDF file, you may use the table of contents to jump directly to
-any part of the document, as it consists of clickable links. 
+this documentation -- even that is a valid HyperList. 
 
 ------------------------------------------------------------------------------
 4.1 Starter                                                *HyperList-Starter*
@@ -329,9 +328,9 @@ require a Multi-line Indicator.
 		1. Following lines are of the same indent with a "space" before
 		 the text
 		+ If one Item on a certain level/indent is multi-line, all Items
-		 on the same level/indent must start with a plus sign ("+") or #Identifier 
+		 on the same level/indent must start with a plus sign ("+") or <Identifier> 
 
-The hash sign ("#") near the end will be discussed later in this article.
+The angle brackets near the end will be discussed later in this article.
 
 ------------------------------------------------------------------------------
 4.2 Type                                                      *HyperList-Type*
@@ -354,8 +353,8 @@ A HyperList Item must have some sort of Content. The Content can be an
 ------------------------------------------------------------------------------
 4.3.1 Elements                                            *HyperList-Elements*
 
-An Element is either an "Operator", a "Qualifier", a "Tag" or a "Description".
-Let's treat each of these concepts.
+An Element is either an "Operator", a "Qualifier", a "Property" or a
+"Description". Let's treat each of these concepts.
 
 ------------------------------------------------------------------------------
 4.3.1.1 Operator                                          *HyperList-Operator*
@@ -383,7 +382,7 @@ line. Example:
    \
    This is a block of literal text...
    Where nothing counts as HyperList markup
-   Thus - neither this: [?] nor THIS: #Test - are seen as markup
+   Thus - neither this: [?] nor THIS: <Test> - are seen as markup
    ...until we end this block with...
    \
 
@@ -412,8 +411,15 @@ separate them by periods. The usage is best described by a few examples:
 * Do Item a minimum 2 and a maximum 7 of times while it rains and temperature
   is less than 5 degrees Celsius = "[2..7, Raining, Temperature <5°C]"
 * Do Item in the context of "apples", then "oranges", then "grapes" =
-  "[Apples. Oranges. Grapes]".
-	With this you can reuse a procedure in many contexts.
+	"[Apples. Oranges. Grapes]". With this you can reuse a procedure in many
+	contexts.
+
+You can add a question mark before the qualifier statement to make it clearer
+that it is an ``if'' statement. These are equivalent:
+
+   [? Raining] Bring unbrella
+	 
+   [Raining] Bring unbrella
 
 To indicate that an Item is optional, use "[?]". Example:
 
@@ -446,7 +452,7 @@ Timestamps that represent an amount of time may be relative, such as:
 * Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
 * Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
 * More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
-* Length of time to wait after doing referenced Item = "[+YYYY-MM-DD#OtherItem]"
+* Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<OtherItem>]"
 
 The last example introduces a new concept, the "Reference". References will be
 discussed below.
@@ -460,7 +466,7 @@ Some practical examples:
 
 * Wait one month before doing the Item = "[+YYYY-01-DD]"
 * Do Item less than 4 days before next Item = "[<-YYYY-MM-04]"
-* Wait one year and two days after Item X = "[+0001-00-02#X]"
+* Wait one year and two days after Item X = "[+0001-00-02<X>]"
 
 It is also possible to have recurring Items in \hyperlist. The strict format is
 "YYYY-MM-DD+X DAY hh.mm+Y - YYYY-MM-DD hh.mm". The first date marks the
@@ -505,13 +511,14 @@ Tag. The timestamp as a Tag does not limit when the Item is to be done. It
 supplies information about when it was done.
 
 ------------------------------------------------------------------------------
-4.3.1.2 Tags                                                  *HyperList-Tags*
+4.3.1.2 Property                                          *HyperList-Property*
 
-A Tag is any attribute describing the Content. It ends in a colon and a space.
+A Property is any attribute describing the Content. It ends in a colon and a
+space.
 
-Examples of Tags could be: "Location = Someplace:", "Color = Green:", "Strength
-= Medium:" and "In Norway:". Anything that tags or gives additional information
-or description to the Content.
+Examples of Properties could be: "Location = Someplace:", "Color = Green:",
+"Strength = Medium:" and "In Norway:". Anything that gives additional
+information or description to the Content.
 
 ------------------------------------------------------------------------------
 4.3.1.3 Description                                    *HyperList-Description*
@@ -522,19 +529,18 @@ Items do have a Description. Many Items have only a Description, such as those
 in a simple todo list.
 
 ------------------------------------------------------------------------------
-4.3.2 Additives                                          *HyperList-Additives*
+4.3.2 Additive                                            *HyperList-Additive*
 
 Additives can be used alone or in combination with Elements. An Additive can
 either be a "Reference", a "Comment", a "Quote" or a "Change Markup".
 
 ------------------------------------------------------------------------------
-4.3.2.1 References                                      *HyperList-References*
+4.3.2.1 Reference                                        *HyperList-Reference*
 
-A hash sign ("#") followed by the name of an Item, list or anything else is a
-Reference. An example would be a Reference to a website, such as
-#http://www.isene.com/, or a file, #file:/path/to/filename. A Reference with
-spaces must be enclosed in single quotation marks: #'This is a Reference', as
-opposed to #Reference.
+A reference is enclosed in angle brackets ("<>"). A reference can be the name
+of an Item, another HyperList or anything else. An example would be a Reference
+to a website, such as <http://www.isene.com/>, a file,
+<file:/path/to/filename>, or another item <The referenced item's Description>.
 
 There are two types of References:
 
@@ -544,7 +550,7 @@ There are two types of References:
 An Item consisting only of a Reference is a redirection. For a transition Item
 this means one would jump to the referenced Item and continue execution from
 there. If the redirect is to jump back after executing the referenced Item (and
-its children), then add another hash at the beginning, such as ##Reference.
+its children), then add another hash at the beginning, such as <<Reference>>.
 This makes it easy to create more compact HyperList by adding a set of
 frequently used subroutines at the end of the list. For a state Item, a
 Reference means one would include the referenced Item (and its children) at the
@@ -558,7 +564,7 @@ There are two special redirections for transition Items:
 If the Reference is only part of an Item, it is a "soft Reference". It
 indicates that one would look for more information at the referenced Item. An
 even softer Reference would be to put the Reference in parentheses, such as
-(#Reference), indicating that the referenced Item is only something apropos.
+(<Reference>), indicating that the referenced Item is only something apropos.
 Parentheses are used for Comments and will be discussed later.
 
 A Reference can be to any place in the list, up or down, or to another list or
@@ -574,7 +580,7 @@ appropriate Content, usually the Description. Examples:
 	The first Item
 		A child Item
 			A grandchild
-				#'A child Item'
+				<A child Item>
 
 It would make sense to use an Identifier for an Item if the Description is long
 and you want to refer to that Item: 
@@ -582,13 +588,13 @@ and you want to refer to that Item:
 	The first Item
 		1 A child Item
 			A grandchild
-				#1
+				<1>
 
 If you refer to an Item further down the hierarchy, you would use a forward
 slash ("/") to separate each level (like the "path" used in a URL):
 
 	The first Item
-		A child Item (#'A grandchild/A baby')
+		A child Item (<A grandchild/A baby>)
 			A grandchild
 				A baby
 
@@ -601,7 +607,7 @@ and reference the path from there:
 			A grandchild
 	Another branch
 		A leaf
-			#'The first Item/A child Item/A grandchild'
+			<The first Item/A child Item/A grandchild>
 
 Or, if the referenced Item has a unique identifier, simply use that:
 
@@ -610,20 +616,28 @@ Or, if the referenced Item has a unique identifier, simply use that:
 			1 A grandchild
 	Another branch
 		A leaf
-			#1
+			<1>
 
-You may use a unique concatenation of a path to shorten it, such as #'Somewhere
-higher up/One lev.../Ref...'. The three periods indicate concatenation.
+You may use a unique concatenation of a path to shorten it, such as 
+<Somewhere higher up/One lev.../Ref...>. The three periods indicate
+concatenation.
 
 ------------------------------------------------------------------------------
-4.3.2.2 Comments                                          *HyperList-Comments*
+4.3.2.2 Tag                                                    *HyperList-Tag*
+
+A Tag is a "marker" for an item. It tags an item and is used just like hashtags
+in Twitter. Examples: #TODO #RememberThis #First #SandraLyng. No spaces are
+allowed in a tag.
+
+------------------------------------------------------------------------------
+4.3.2.2 Comment                                            *HyperList-Comment*
 
 Anything within parentheses is a Comment. Comments are are not executed as
 HyperList commands -- i.e. in a list of transition Items, they are not actions
 to be executed.
 
 ------------------------------------------------------------------------------
-4.3.2.3 Quotes                                              *HyperList-Quotes*
+4.3.2.3 Quote                                                *HyperList-Quote*
 
 Anything in quotation marks is a Quote. Like a Comment, a Quote is not executed
 as a HyperList command.
@@ -633,19 +647,19 @@ as a HyperList command.
 
 When working with HyperList, especially on paper, there may come a need to mark
 deletion of Items or to show where an Item should be moved to. To accommodate
-this need, Change Markup is introduced.
+this need, Change Markup is introduced. Change markup is a special type of Tag.
 
-If "<<" is added at the end of an Item, it is slated for deletion. To show that
-an Item should be moved, add ">>" at the end followed by a Reference showing to
-which Item it should be moved below.
+If "##<" is added at the end of an Item, it is slated for deletion. To show
+that an Item should be moved, add "##>" at the end followed by a Reference
+showing to which Item it should be moved below.
 
-To indent an Item to the left, add "<-". Indenting an Item to the right is
-marked by "->". It is possible to combine moving and indenting an Item, i.e.
-moving an Item and making it a child of another: ">>#Ref->".
+To indent an Item to the left, add "##<-". Indenting an Item to the right is
+marked by "##->". It is possible to combine moving and indenting an Item, i.e.
+moving an Item and making it a child of another: "##>><Ref>##->".
 
 To signify that an Item has been changed from a previous version of a
-HyperList, prefix the Item with "<<>>". Inside the angle brackets you may
-include information about the change done, e.g. "<<John 2012-03-21>>" to show
+HyperList, prefix the Item with "##text##". Inside the hash signs you may
+include information about the change done, e.g. "##John 2012-03-21##" to show
 that the Item was changed by a certain person at a given time.
 
 ------------------------------------------------------------------------------
@@ -773,9 +787,9 @@ First, here is a simple list showing what HyperList is all about:
 			State or transition
 		Content (can be an Element and/or an Additive)
 			Element
-				Either an Operator, Qualifier, Tag, or Description
+				Either an Operator, Qualifier, Property, or Description
 			Additive    
-				Either a Reference, Comment, Quote, or Change Markup
+				Either a Reference, Tag, Comment, Quote, or Change Markup
 		Separator
 			Newline or semicolon
 
@@ -793,10 +807,11 @@ strict by using the system concisely:
 			Element; AND/OR:
 				Operator
 				Qualifier
-				Tag
+				Property
 				Description
 			Additive; AND/OR:
 				Reference
+				Tag
 				Comment
 				Quote
 				Change Markup
@@ -820,12 +835,12 @@ HLstart
 			[?] Starter; OR: 
 				Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")}
 					[Multi-line Item] The Identifier serves as a plus sign ("+")}
-						#1
+						<1>
 				Multi-line Indicator = "+"
 					1 Following lines are of same indent with a "space" before
 					 the text
 					+ If one Item on a certain indent is multi-line, all Items on the same indent
-					 (including single-line Items) must start with a plus sign ("+")} or #Identifier
+					 (including single-line Items) must start with a plus sign ("+")} or <Identifier>
 			[?] Type
 				OR: 
 					State = "S:" or "|"
@@ -858,7 +873,7 @@ HLstart
 									\
 									This is a block of literal text...
 									Where nothing counts as HyperList markup
-									Thus - neither this: [?] nor THIS: #Test - are seen as markup
+									Thus - neither this: [?] nor THIS: <Test> - are seen as markup
 									...until we end this block with...
 									\
 					Qualifier
@@ -888,14 +903,14 @@ HLstart
 							Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
 							Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
 							More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
-							Length of time to wait after doing referenced Item = "[+YYYY-MM-DD#Item]"
+							Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<Item]>"
 							Other obvious time indicators may be used; EXAMPLES: 
 								"[+1 week]"
 								"[-2 Martian years]"
 							EXAMPLES: 
 								Wait one month before doing the Item = "[+YYYY-01-DD]"
 								Do Item less than 4 days before next Item = "[<-YYYY-MM-04]"
-								Wait one year and two days after Item X = "[+0001-00-02#X]"
+								Wait one year and two days after Item X = "[+0001-00-02<X>]"
 							Time repetition
 								Obvious/intuitive repetition
 									EXAMPLES: 
@@ -914,8 +929,8 @@ HLstart
 								Unchecked Item = "[_]"
 								Checked Item = "[x]" 
 									[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
-					Tag
-						Any attribute to the #Content, ending in a colon and a space
+					Property
+						Any attribute to the <Content>, ending in a colon and a space
 							Gives additional information or description to the Item
 						EXAMPLES: 
 							"Location = Someplace:", "Color = Green:", "Strength = Medium:" and "In Norway:"
@@ -923,23 +938,21 @@ HLstart
 						The main body of the HyperList Item, the "meat" of the line
 				Additive; AND/OR: 
 					Reference
-						+ A "#" followed by an Item name or Identifier, list name or 
-						 anything else; EXAMPLES: 
-							Reference to a website = "#http://www.isene.com/"
-							Reference to a file = "#file:/path/to/filename"
-						+ A Reference with spaces is enclosed in single quotation marks
-						 (#'This is a Reference', as opposed to #Reference)
+						+ An Item name or Identifier, list name or anything else
+						 enclosed in angle brackets ("<>"); EXAMPLES: 
+							Reference to a website = "<http://www.isene.com/>"
+							Reference to a file = "<file:/path/to/filename>"
 						+ There are two types of References; OR: 
 							Redirection (hard Reference)
 								An Item consisting only of a Reference is a redirection
 									For a transition Item = Jump to referenced Item and execute
 										+ If the redirect is to jump back after executing 
 										 the referenced Item (and its children), then add another 
-										 hash at the beginning (##'Referenced Item')
+										 set of angle brackets (<<Referenced Item>>)
 											+ EXAMPLE: Use this when creating subroutines at 
 											 the end of the list
 									For a state Item = Include the referenced Item
-								An Item consisting only of the key word "SKIP" 
+								An Item consisting only of the key word "SKIP"
 									Ends the current HyperList level
 								An Item consisting only of the key word "END" 
 									Ends the whole HyperList
@@ -949,16 +962,19 @@ HLstart
 								Even softer Reference = have the Reference in parentheses
 									An Item that is only something apropos
 						+ A Reference to any Item upward in the HyperList is simply a
-						 Reference to the Item's #Content
+						 Reference to the Item's <Content>
 						+ A Reference containing several levels down a HyperList needs a "/" 
 						 to separate each level, like a "path" (as with a URL) to the Item
 						+ To make a Reference to a different branch in a HyperList, 
 						 start the Reference from the highest common level on the list
 						 and include all Items down to the referenced Item
-							EXAMPLE: Reference from here to #Hyperlist Item/Starter/Identifier
+							EXAMPLE: Reference from here to <Hyperlist Item/Starter/Identifier>
 						+ For long Items in a Reference, concatenation can be used
 							The concatenation must be unique
-								EXAMPLE: Reference from here to #Additive/Comment/Anything...
+								EXAMPLE: Reference from here to <Additive/Comment/Anything...>
+					Tag
+						A hash sign followed by any letters or numbers, used as a marker (#Tagged)
+						Is not executed as a HyperList command
 					Comment
 						Anything within parentheses is a Comment
 						Is not executed as a HyperList command
@@ -967,17 +983,17 @@ HLstart
 						Is not executed as a HyperList command
 					Change Markup; OR: 
 						Deletion
-							Remove the Item by adding "<<" at the end of the Item
+							Remove the Item by adding "##<" at the end of the Item
 						Motion; OPTIONS: 
-							Move the Item by adding ">>#Reference"
+							Move the Item by adding "##><Reference>"
 								This moves the Item just below the referenced Item
-							Move the Item one level in by adding "<-" at the end of the Item
-							Move the Item one level out by adding "->" at the end of the Item
-								EXAMPLE: Move an Item as a child to referenced Item = ">>#Reference->"
+							Move the Item one level in by adding "##<-" at the end of the Item
+							Move the Item one level out by adding "##->" at the end of the Item
+								EXAMPLE: Move an Item as a child to referenced Item = "##><Reference>##->"
 						Changed Item
-							Prefix an Item with "<<>>" to signify that a change has been made
+							Prefix an Item with "##Text##" to signify that a change has been made
 								Add information inside the angle brackets as appropriate
-									EXAMPLE: To show who changed it and when = "<<John 2012-03-21>>"
+									EXAMPLE: To show who changed it and when = "##John 2012-03-21##"
 			Separator 
 				OR: 
 					Semicolon
@@ -988,12 +1004,12 @@ HLstart
 							A Tab or an asterisk ("*")}
 								Used to add a child
 									A child adds information to its parent
-									A child is another regular #'HyperList Item'
+									A child is another regular <HyperList Item>
 				Definition
 					A Separator and the same or less indent normally reads "then:"
-					[parent contains #Description]} 
+					[parent contains <Description>]} 
 						The Separator and right indent reads "with:" or "consists of:"
-					[NOT: parent contains #Description]} 
+					[NOT: parent contains <Description>]} 
 						The Separator and right indent reads "applies to:"
 						A Separator between the children reads "and:"
 HLend
@@ -1009,6 +1025,16 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3			2015-02-08
+
+	Version upgraded to HyperList definition 2.3
+	Made the changes necessary to accommodate for Twitter-type (hash)Tags
+	New markup for References (and included "@" in references)
+	Fixed bold/italic/underlined
+	Changed the Change Markup
+	Updated Latex/HTML conversion
+	Updated documentation
 
 VERSION 2.1.7		2012-10-17
 
@@ -1310,15 +1336,12 @@ VERSION 0.4	    2009-01-16
 Thanks to Jean-Dominique Warnier and Kenneth Orr for the original idea of this
 type of markup.
 
-Thanks to Egil Möller for helping to cultivate the first versions.
-
-Thanks to Axel Liljencrantz for his input in outlining WOIM.
-
-Thanks to Christian Bryn for testing of the plugin.
-
-Thanks to Christopher Truett for his Checkbox VIM plugin.
-
-Thanks to Noah Spurrier for his OpenSSL VIM plugin.
+Thanks to:
+Egil Möller for helping to cultivate the first versions.
+Axel Liljencrantz for his input in outlining WOIM.
+Christian Bryn for testing of the plugin.
+Christopher Truett for his Checkbox VIM plugin.
+Noah Spurrier for his OpenSSL VIM plugin.
 
 ==============================================================================
 9 License                                                  *HyperList-License*
