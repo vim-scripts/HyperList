@@ -12,15 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3 - compatible with the HyperList definition v. 2.3
-" Modified:	2015-02-14
-" Changes:      Updated plugin to HyperList definition version 2.3
-"               Made the changes necessary to accommodate for Twitter-type (hash)Tags
-"               New markup for References (and included "@" in references)
-"               Fixed bold/italic/underlined
-"               Changed the Change Markup
-"               Updated Latex/HTML conversion
-"               Updated documentation
+" Version:	2.3.1 - compatible with the HyperList definition v. 2.3
+" Modified:	2015-06-30
+" Changes:      Added the function OpenFile() to open referenced file (mapped to 'gf')
 
 " INSTRUCTIONS {{{1
 "
@@ -177,6 +171,25 @@ if !exists("*GotoRef")
     endif
   endfunction
 endif
+
+"  Open file under cursor {{{2
+"  Mapped to 'gf'
+function! OpenFile()
+  if expand('<cWORD>') =~ '<' && expand('<cWORD>') =~ '>'
+    let gofl = expand('<cfile>')
+    if gofl =~ '\(odt$\|doc$\|docx$\|odc$\|xls$\|xlsx$\|odp$\|ppt$\|pptx$\)'
+      exe '!libreoffice "'.gofl.'"'
+    elseif gofl =~ '\(jpg$\|jpeg$\|png$\|bmp$\|gif$\)'
+      exe '!feh "'.gofl.'"'
+    elseif gofl =~ 'pdf$'
+      exe '!zathura "'.gofl.'"'
+    else
+      edit gofl
+    endif
+  else
+    echo "No reference"
+  endif
+endfunction
 
 "  HTML conversion{{{2
 "  Mapped to '<leader>H'
@@ -549,6 +562,8 @@ map <leader><SPACE>   /=\s*$<CR>A
 
 nmap gr		      m':call GotoRef()<CR>
 nmap <CR>	      m':call GotoRef()<CR>
+
+nmap gf               :call OpenFile()<CR>
 
 nmap g<DOWN>          <DOWN><leader>0zv
 nmap g<UP>            <leader>f<UP><leader>0zv

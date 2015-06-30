@@ -1,4 +1,4 @@
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2)
+GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.1)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -65,6 +65,11 @@ the list or to a file by the use of #file:/pathto/filename,
 Whenever you jump to a reference in this way, the mark "'" is set at the
 point you jumped from so that you may easily jump back by hitting "''"
 (single quoutes twice). 
+
+Use "gf" to open the file under the cursor. Graphic files are opened in
+"feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
+filetypes are opened in VIM for editing. All this can be changed by
+editing the function OpenFile() in the file "hyperlist.vim".
 
 Use <leader>u to toggle underlining of Transitions, States or no underlining.
 
